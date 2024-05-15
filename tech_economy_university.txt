@@ -1,0 +1,71 @@
+CREATE SCHEMA university;
+
+CREATE TABLE university.faculty(faculty_id int PRIMARY KEY,
+					 name varchar(100),
+					 amount int);
+
+CREATE TABLE university.faculty(
+	faculty_id int PRIMARY KEY,
+	name varchar(100),
+	amount int);
+
+CREATE TABLE university.course(
+	course_id int PRIMARY KEY,
+	level int,
+	faculty_id int REFERENCES university.faculty(faculty_id));	
+	
+CREATE TABLE university.student(
+	student_id int PRIMARY KEY,
+	first_name varchar(100),
+	middle_name varchar(100),
+	last_name varchar(100),
+	on_budget boolean,
+	course_id int REFERENCES university.course(course_id));	
+	
+INSERT INTO university.faculty VALUES(1, 'Инженерный', 30000);	
+INSERT INTO university.faculty VALUES(2, 'Экономический', 49000);	
+
+INSERT INTO university.course VALUES(1, 1, 1);
+INSERT INTO university.course VALUES(2, 1, 2);
+INSERT INTO university.course VALUES(3, 4, 2);
+
+INSERT INTO university.student VALUES(1, 'Петр', 'Петрович', 'Петров', TRUE, 1);
+INSERT INTO university.student VALUES(2, 'Иван', 'Иванович', 'Иванов', FALSE, 2);
+INSERT INTO university.student VALUES(3, 'Сергей', 'Иванович', 'Михно', TRUE, 3);
+INSERT INTO university.student VALUES(4, 'Ирина', 'Юрьевна', 'Стоцкая', FALSE, 3);
+INSERT INTO university.student(student_id, first_name, last_name, on_budget, course_id)
+VALUES(5, 'Настасья', 'Младич', FALSE, 2);
+
+--3.1
+--Вывести всех студентов, кто платит больше 30_000
+select * 
+from university.student st
+	join university.course co on st.course_id = co.course_id
+	join university.faculty fa on co.faculty_id = fa.faculty_id
+	where fa.amount > 30000;
+	
+--3.2
+--Перевести всех студентов Петровых на 1 курс экономического факультета
+UPDATE university.student
+SET course_id = 2
+WHERE last_name = 'Петров';
+
+--3.3
+--Вывести всех студентов без отчества или фамилии
+select *
+from university.student st
+where st.middle_name is NULL or st.last_name is NULL;
+
+--3.4
+--Вывести всех студентов содержащих в фамилии или в имени или в отчестве "ван"
+select * 
+from university.student st
+where st.first_name like '%ван%' 
+or st.middle_name like '%ван%' 
+or st.last_name like '%ван%';
+
+--3.5
+--Удалить все записи из всех таблиц
+delete from university.student;
+delete from university.course;
+delete from university.faculty;
