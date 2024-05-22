@@ -1,0 +1,34 @@
+--1. Посчитать количество заказов за все время
+
+select count(order_id) 
+from orders
+
+--2. Посчитать сумму по всем заказам за все время (учитывая скидки)
+
+select cast(sum((unit_price * quantity) - unit_price * discount * quantity) as numeric(9,2)) as "Сумма по всем заказам"
+from order_details
+
+--3. Показать сколько сотрудников работает в каждом городе.
+
+select city, count(*)
+from employees
+group by city
+
+--4. Выявить самый продаваемый товар в штуках. Вывести имя продукта и его количество.
+
+select pr.product_name, de.quantity
+from products pr join order_details de on pr.product_id = de.product_id
+where quantity = (select max(quantity)
+				 from order_details)
+
+--5. Выявить фио сотрудника, у которого сумма всех заказов самая маленькая
+
+select last_name, first_name
+from employees
+where employee_id = (select ors.employee_id
+					from order_details ord join orders ors on ord.order_id = ors.order_id
+					group by ors.employee_id
+					order by sum(unit_price * quantity - unit_price * discount * quantity)
+					limit 1
+					)
+
